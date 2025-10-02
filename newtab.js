@@ -19,7 +19,7 @@ async function inlineSvgs() {
 }
 
 /* 2) Fetch and apply Unsplash background */
-async function loadUnsplashBackground(query = 'nature,landscape') {
+async function loadUnsplashBackground(query = 'nature,landscape', forceNew = false) {
   const accessKey = 'hNW7fCcfsZNDJ9QFYa_bro9LdQPVksJmKq2R9l3I6tc';
   const stage = document.getElementById('stage');
 
@@ -29,8 +29,9 @@ async function loadUnsplashBackground(query = 'nature,landscape') {
   }
 
   try {
+    const cacheBuster = forceNew ? `&t=${Date.now()}` : '';
     const response = await fetch(
-      `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape`,
+      `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape${cacheBuster}`,
       {
         headers: {
           'Authorization': `Client-ID ${accessKey}`
@@ -60,6 +61,20 @@ async function loadUnsplashBackground(query = 'nature,landscape') {
   } catch (err) {
     console.error('Failed to load Unsplash background:', err);
   }
+}
+
+function applyCustomBackground(imageDataUrl) {
+  const stage = document.getElementById('stage');
+  const existingAttribution = stage.querySelector('.unsplash-attribution');
+  if (existingAttribution) {
+    existingAttribution.remove();
+  }
+
+  stage.style.backgroundImage = `url('${imageDataUrl}'), linear-gradient(180deg, #f9f8f5 0%, #fef5f6 100%)`;
+  stage.style.backgroundSize = 'cover, 100% 100%';
+  stage.style.backgroundPosition = 'center, center';
+
+  chrome.storage.local.set({ customBackground: imageDataUrl });
 }
 
 function setupBackgroundControls() {
@@ -101,8 +116,10 @@ function setupBackgroundControls() {
   randomBtn.addEventListener('click', () => {
     const randomQueries = ['nature', 'landscape', 'mountain', 'ocean', 'forest', 'sunset', 'sky', 'beach', 'lake', 'waterfall'];
     const randomQuery = randomQueries[Math.floor(Math.random() * randomQueries.length)];
-    loadUnsplashBackground(randomQuery);
+    chrome.storage.local.remove('customBackground');
+    loadUnsplashBackground(randomQuery, true);
   });
+}
 }
 
 /* 3) Minimal keyboard handling for icon buttons (optional): activate with Enter/Space */
@@ -121,11 +138,40 @@ function wireIconButtons() {
   });
 }
 
+function setupCustomUpload() {
+  const uploadInput = document.getElementById('upload-input');
+  const uploadBtn = document.getElementById('upload-btn');
+
+  uploadBtn.addEventListener('click', () => {
+    uploadInput.click();
+  });
+
+  uploadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        applyCustomBackground(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
 /* Initialize everything once DOM is ready */
 document.addEventListener('DOMContentLoaded', () => {
   inlineSvgs().then(()=>{});
-  loadUnsplashBackground();
+
+  chrome.storage.local.get(['customBackground'], (result) => {
+    if (result.customBackground) {
+      applyCustomBackground(result.customBackground);
+    } else {
+      loadUnsplashBackground();
+    }
+  });
+
   setupBackgroundControls();
+  setupCustomUpload();
   wireIconButtons();
 });
 
