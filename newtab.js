@@ -18,8 +18,44 @@ async function inlineSvgs() {
   }));
 }
 
-/* 2) Lazy-load videos removed (no longer used) */
-function lazyLoadMedia() { /* noop */ }
+/* 2) Fetch and apply Unsplash background */
+async function loadUnsplashBackground() {
+  const accessKey = 'hNW7fCcfsZNDJ9QFYa_bro9LdQPVksJmKq2R9l3I6tc';
+  const stage = document.getElementById('stage');
+
+  try {
+    const response = await fetch(
+      `https://api.unsplash.com/photos/random?query=nature,landscape&orientation=landscape`,
+      {
+        headers: {
+          'Authorization': `Client-ID ${accessKey}`
+        }
+      }
+    );
+
+    if (!response.ok) throw new Error('Failed to fetch from Unsplash');
+
+    const data = await response.json();
+    const imageUrl = data.urls.regular;
+    const photographerName = data.user.name;
+    const photographerUrl = data.user.links.html;
+    const photoUrl = data.links.html;
+
+    stage.style.backgroundImage = `url('${imageUrl}'), linear-gradient(180deg, #f9f8f5 0%, #fef5f6 100%)`;
+    stage.style.backgroundSize = 'cover, 100% 100%';
+    stage.style.backgroundPosition = 'center, center';
+
+    const attribution = document.createElement('div');
+    attribution.className = 'unsplash-attribution';
+    attribution.innerHTML = `
+      <span>Photo by <a href="${photographerUrl}?utm_source=100school_extension&utm_medium=referral" target="_blank" rel="noopener">${photographerName}</a> on <a href="${photoUrl}?utm_source=100school_extension&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></span>
+    `;
+    stage.appendChild(attribution);
+
+  } catch (err) {
+    console.error('Failed to load Unsplash background:', err);
+  }
+}
 
 /* 3) Minimal keyboard handling for icon buttons (optional): activate with Enter/Space */
 function wireIconButtons() {
@@ -40,7 +76,7 @@ function wireIconButtons() {
 /* Initialize everything once DOM is ready */
 document.addEventListener('DOMContentLoaded', () => {
   inlineSvgs().then(()=>{});
-  lazyLoadMedia();
+  loadUnsplashBackground();
   wireIconButtons();
 });
 
