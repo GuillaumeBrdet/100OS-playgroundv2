@@ -99,7 +99,9 @@ function setupBackgroundControls() {
   });
 
   randomBtn.addEventListener('click', () => {
-    loadUnsplashBackground('nature,landscape');
+    const randomQueries = ['nature', 'landscape', 'mountain', 'ocean', 'forest', 'sunset', 'sky', 'beach', 'lake', 'waterfall'];
+    const randomQuery = randomQueries[Math.floor(Math.random() * randomQueries.length)];
+    loadUnsplashBackground(randomQuery);
   });
 }
 
