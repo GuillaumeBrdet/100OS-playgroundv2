@@ -19,13 +19,18 @@ async function inlineSvgs() {
 }
 
 /* 2) Fetch and apply Unsplash background */
-async function loadUnsplashBackground() {
+async function loadUnsplashBackground(query = 'nature,landscape') {
   const accessKey = 'hNW7fCcfsZNDJ9QFYa_bro9LdQPVksJmKq2R9l3I6tc';
   const stage = document.getElementById('stage');
 
+  const existingAttribution = stage.querySelector('.unsplash-attribution');
+  if (existingAttribution) {
+    existingAttribution.remove();
+  }
+
   try {
     const response = await fetch(
-      `https://api.unsplash.com/photos/random?query=nature,landscape&orientation=landscape`,
+      `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape`,
       {
         headers: {
           'Authorization': `Client-ID ${accessKey}`
@@ -57,6 +62,47 @@ async function loadUnsplashBackground() {
   }
 }
 
+function setupBackgroundControls() {
+  const searchContainer = document.getElementById('search-container');
+  const searchInput = document.getElementById('search-input');
+  const searchBtn = document.getElementById('search-btn');
+  const toggleSearchBtn = document.getElementById('toggle-search-btn');
+  const randomBtn = document.getElementById('random-bg-btn');
+
+  toggleSearchBtn.addEventListener('click', () => {
+    const isActive = searchContainer.classList.contains('active');
+    if (isActive) {
+      searchContainer.classList.remove('active');
+      toggleSearchBtn.classList.remove('active');
+    } else {
+      searchContainer.classList.add('active');
+      toggleSearchBtn.classList.add('active');
+      searchInput.focus();
+    }
+  });
+
+  const performSearch = () => {
+    const query = searchInput.value.trim();
+    if (query) {
+      loadUnsplashBackground(query);
+      searchInput.value = '';
+      searchContainer.classList.remove('active');
+      toggleSearchBtn.classList.remove('active');
+    }
+  };
+
+  searchBtn.addEventListener('click', performSearch);
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      performSearch();
+    }
+  });
+
+  randomBtn.addEventListener('click', () => {
+    loadUnsplashBackground('nature,landscape');
+  });
+}
+
 /* 3) Minimal keyboard handling for icon buttons (optional): activate with Enter/Space */
 function wireIconButtons() {
   const btns = document.querySelectorAll('.icon-btn');
@@ -77,6 +123,7 @@ function wireIconButtons() {
 document.addEventListener('DOMContentLoaded', () => {
   inlineSvgs().then(()=>{});
   loadUnsplashBackground();
+  setupBackgroundControls();
   wireIconButtons();
 });
 

@@ -201,6 +201,105 @@
     text-decoration: underline;
   }
 
+  /* Background controls */
+  .bg-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .bg-search-container {
+    position: relative;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+  .bg-search-container.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .bg-search-input {
+    width: 200px;
+    height: 36px;
+    padding: 0 36px 0 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    font-size: 13px;
+    font-family: inherit;
+    color: #111;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .bg-search-input:focus {
+    outline: none;
+    border-color: var(--icon-hover-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  .bg-search-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+  }
+  .bg-search-btn {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: var(--icon-hover-border);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  .bg-search-btn:hover {
+    background: #D90F22;
+    transform: translateY(-50%) scale(1.05);
+  }
+  .bg-search-btn:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+  .bg-control-btn {
+    width: 36px;
+    height: 36px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    color: #111;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  }
+  .bg-control-btn:hover {
+    background: white;
+    border-color: var(--icon-hover-border);
+    transform: translateY(-2px);
+  }
+  .bg-control-btn:active {
+    transform: translateY(0);
+  }
+  .bg-control-btn.active {
+    background: var(--icon-hover-border);
+    border-color: var(--icon-hover-border);
+    color: white;
+  }
+
 </style>
 </head>
 <body>
@@ -217,6 +316,20 @@
     </div>
 
     <main class="stage" id="stage" role="main" aria-label="Main new tab content">
+      <div class="bg-controls">
+        <div class="bg-search-container" id="search-container">
+          <input
+            type="text"
+            class="bg-search-input"
+            id="search-input"
+            placeholder="Search backgrounds..."
+            aria-label="Search Unsplash backgrounds"
+          />
+          <button class="bg-search-btn" id="search-btn" aria-label="Search" title="Search">→</button>
+        </div>
+        <button class="bg-control-btn" id="toggle-search-btn" aria-label="Toggle search" title="Search backgrounds">🔍</button>
+        <button class="bg-control-btn" id="random-bg-btn" aria-label="Random background" title="Random background">🎲</button>
+      </div>
       <div class="cta" role="region" aria-label="Start lesson">
         <a class="btn" id="start-btn" href="https://learn.100school.com/" target="_blank" rel="noopener">Start Today's Lesson</a>
       </div>
