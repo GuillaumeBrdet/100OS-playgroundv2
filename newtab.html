@@ -17,10 +17,23 @@
     --card-bg: #ffffff;
     --card-border: rgba(16,15,15,0.06);
     --card-border-2: rgba(16,15,15,0.03);
-    --icon-bg: #FFE9EB;      /* soft-pink rectangle behind icons */
-    --icon-hover-border: #FE2034; /* thin red border on hover */
+    --icon-bg: #FFE9EB;
+    --icon-hover-border: #FE2034;
     --icon-size: 56px;
     --icon-svg-size: 28px;
+    --text-primary: #111;
+    --text-secondary: #666;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0f0f0f;
+    --card-bg: #1a1a1a;
+    --card-border: rgba(255,255,255,0.1);
+    --card-border-2: rgba(255,255,255,0.05);
+    --icon-bg: #2a1a1c;
+    --icon-hover-border: #FE2034;
+    --text-primary: #fff;
+    --text-secondary: #aaa;
   }
 
   html,body{height:100%; margin:0; background:var(--bg); font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
@@ -79,20 +92,13 @@
     justify-content:center;
     box-shadow: 0 1px 0 rgba(0,0,0,0.02);
     transition: box-shadow .18s ease, transform .12s ease, border-color .12s ease;
-    border: 2px solid transparent; /* border becomes red on hover/focus */
+    border: 2px solid transparent;
     cursor: pointer;
+    color: var(--text-primary);
   }
   .icon-btn:focus { outline: none; transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.06); }
   .icon-btn:hover { border-color: var(--icon-hover-border); transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.06); }
-
-  /* Inline SVG sizing and colorization:
-     - We use 'color' on the container + currentColor in CSS to control stroke/fill.
-     - If your SVG paths use stroke/fill directly, inlining allows these rules to apply.
-  */
   .icon-btn svg { width: var(--icon-svg-size); height: var(--icon-svg-size); display:block; }
-  /* color for SVG strokes/fills (SVG should use stroke="currentColor" or fill="currentColor" to respond) */
-  .icon-btn { color: #111; } /* black outline by default */
-  .icon-btn:hover { color: #111; } /* we keep icon black on hover; only border changes */
 
   /* Stage: main rounded card area */
   .stage {
@@ -328,6 +334,7 @@
           <button class="bg-search-btn" id="search-btn" aria-label="Search" title="Search">→</button>
         </div>
         <input type="file" id="upload-input" accept="image/*" style="display: none;" />
+        <button class="bg-control-btn" id="theme-toggle-btn" aria-label="Toggle theme" title="Toggle dark/light mode">🌓</button>
         <button class="bg-control-btn" id="upload-btn" aria-label="Upload custom background" title="Upload your own image">📤</button>
         <button class="bg-control-btn" id="toggle-search-btn" aria-label="Toggle search" title="Search Unsplash">🔍</button>
         <button class="bg-control-btn" id="random-bg-btn" aria-label="Random background" title="Get random image">🎲</button>

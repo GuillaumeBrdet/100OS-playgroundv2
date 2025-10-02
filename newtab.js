@@ -87,6 +87,7 @@ function setupBackgroundControls() {
   const searchBtn = document.getElementById('search-btn');
   const toggleSearchBtn = document.getElementById('toggle-search-btn');
   const randomBtn = document.getElementById('random-bg-btn');
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
 
   toggleSearchBtn.addEventListener('click', () => {
     const isActive = searchContainer.classList.contains('active');
@@ -123,6 +124,43 @@ function setupBackgroundControls() {
     chrome.storage.local.remove('customBackground');
     loadUnsplashBackground(randomQuery, true);
   });
+
+  themeToggleBtn.addEventListener('click', () => {
+    toggleTheme();
+  });
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const currentTheme = html.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+  html.setAttribute('data-theme', newTheme);
+
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) {
+    themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌓';
+  }
+
+  if (typeof chrome !== 'undefined' && chrome.storage) {
+    chrome.storage.local.set({ theme: newTheme }, () => {
+      console.log('Theme saved:', newTheme);
+    });
+  }
+}
+
+function loadTheme() {
+  if (typeof chrome !== 'undefined' && chrome.storage) {
+    chrome.storage.local.get(['theme'], (result) => {
+      const theme = result.theme || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      if (themeBtn) {
+        themeBtn.textContent = theme === 'dark' ? '☀️' : '🌓';
+      }
+    });
+  }
 }
 
 /* 3) Minimal keyboard handling for icon buttons (optional): activate with Enter/Space */
@@ -178,6 +216,8 @@ function setupCustomUpload() {
 /* Initialize everything once DOM is ready */
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOM loaded, initializing...');
+
+  loadTheme();
   inlineSvgs().then(()=>{});
 
   if (typeof chrome !== 'undefined' && chrome.storage) {
