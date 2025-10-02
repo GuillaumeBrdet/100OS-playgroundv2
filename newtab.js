@@ -74,7 +74,11 @@ function applyCustomBackground(imageDataUrl) {
   stage.style.backgroundSize = 'cover, 100% 100%';
   stage.style.backgroundPosition = 'center, center';
 
-  chrome.storage.local.set({ customBackground: imageDataUrl });
+  if (typeof chrome !== 'undefined' && chrome.storage) {
+    chrome.storage.local.set({ customBackground: imageDataUrl }, () => {
+      console.log('Custom background saved to storage');
+    });
+  }
 }
 
 function setupBackgroundControls() {
@@ -141,33 +145,54 @@ function setupCustomUpload() {
   const uploadInput = document.getElementById('upload-input');
   const uploadBtn = document.getElementById('upload-btn');
 
-  uploadBtn.addEventListener('click', () => {
+  if (!uploadBtn || !uploadInput) {
+    console.error('Upload button or input not found');
+    return;
+  }
+
+  uploadBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Upload button clicked');
     uploadInput.click();
   });
 
   uploadInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
+    console.log('File selected:', file);
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (event) => {
+        console.log('Image loaded, applying background');
         applyCustomBackground(event.target.result);
       };
+      reader.onerror = (error) => {
+        console.error('FileReader error:', error);
+      };
       reader.readAsDataURL(file);
+    } else {
+      console.error('Invalid file type');
     }
   });
 }
 
 /* Initialize everything once DOM is ready */
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded, initializing...');
   inlineSvgs().then(()=>{});
 
-  chrome.storage.local.get(['customBackground'], (result) => {
-    if (result.customBackground) {
-      applyCustomBackground(result.customBackground);
-    } else {
-      loadUnsplashBackground();
-    }
-  });
+  if (typeof chrome !== 'undefined' && chrome.storage) {
+    chrome.storage.local.get(['customBackground'], (result) => {
+      if (result.customBackground) {
+        console.log('Loading saved custom background');
+        applyCustomBackground(result.customBackground);
+      } else {
+        loadUnsplashBackground();
+      }
+    });
+  } else {
+    console.log('Chrome storage not available, loading default background');
+    loadUnsplashBackground();
+  }
 
   setupBackgroundControls();
   setupCustomUpload();
