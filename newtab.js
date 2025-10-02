@@ -120,7 +120,6 @@ function setupBackgroundControls() {
     loadUnsplashBackground(randomQuery, true);
   });
 }
-}
 
 /* 3) Minimal keyboard handling for icon buttons (optional): activate with Enter/Space */
 function wireIconButtons() {
